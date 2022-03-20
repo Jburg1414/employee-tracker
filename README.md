@@ -18,7 +18,10 @@ npm i, npm i mysql2, npm i inquirer
 
 ## Usage
 Download the zip file of this repo, install the necessary packages. Navigate to the command line, log in to mysql and call the schema.sql database and any other databases that are needed. Then run npm start and the list of questions should be in the command line. 
-None
+
+## Walkthrough or Screenshot
+[Walkthrough](https://youtu.be/hLh0NOEiyCA)
+
 
 ## Credits
 Jace Burgess, Bobbi Tarkany (tutor)

@@ -131,7 +131,7 @@ function role() {
 };
 function emp() {
     db.query("SELECT id, title FROM role", (err,role) => {
-        db.query("SELECT id, last_name FROM employee", (err, manager) => {
+        db.query("SELECT id, last_name FROM employee", (err, employee) => {
 
             inquirer.prompt([
                 {
@@ -154,7 +154,7 @@ function emp() {
                     type: "list",
                     name: "manager",
                     message: "What is the manager id for the new employee?",
-                    choices: manager.map(x => ({name: x.title, value: x.id}))
+                    choices: employee.map(x => ({name: x.first_name, value: x.id}))
                 }
             ]) .then((answer) => {
                 db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)", [answer.first_name, answer.last_name, answer.role_id, answer.manager], (err, res) => {
@@ -185,7 +185,7 @@ function updateEmp() {
                     choices: role.map(x => ({name: x.title, value: x.id}))
                 }
             ]) .then((answer) => {
-                db.query("UPDATE employee SET role_id = '?'  WHERE 'id' = '?' ", [answer.role, answer.employee], (err, res) => {
+                db.query("UPDATE employee SET role_id = '?'  WHERE 'id' = '?' ", [answer.role.id, answer.employee], (err, res) => {
                     if (err) throw err;
                     console.table(res);
                     menu();
