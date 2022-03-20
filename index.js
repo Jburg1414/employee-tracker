@@ -21,7 +21,7 @@ function menu () {
             type: 'list',
             name: 'menu',
             message: 'What would you like to do?',
-            choices: ["view all departments", "view all roles", "view all employees", "add a department", "add a role", "add an employee", "update an employee role"]
+            choices: ["view all departments", "view all role", "view all employees", "add a department", "add a role", "add an employee", "update an employee role"]
         }
 ]) .then((answer) => {
     switch (answer.menu) {
@@ -29,8 +29,8 @@ function menu () {
             // execute view departments function
             viewDpt();
             break;
-        case "view all roles":
-            // execute view roles function
+        case "view all role":
+            // execute view role function
             viewRoles();
             break;
         case "view all employees":
@@ -69,7 +69,7 @@ function viewDpt() {
 };
 
 function viewRoles() {
-    db.query("SELECT * FROM roles", (err, res) => {
+    db.query("SELECT * FROM role", (err, res) => {
         if (err) throw err;
         console.table(res);
         menu();
@@ -121,7 +121,7 @@ function role() {
                 choices: department.map(x => ({name: x.name, value: x.id}))
             }
             ]) .then((answer) => {
-                db.query("INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)", [answer.title, answer.salary, answer.department_id], (err, res) => {
+                db.query("INSERT INTO role (title, salary, department_id) VALUES (?,?,?)", [answer.title, answer.salary, answer.department_id], (err, res) => {
                 if (err) throw err;
                 console.table(res);
                 menu();
@@ -130,7 +130,7 @@ function role() {
     });
 };
 function emp() {
-    db.query("SELECT id, title FROM roles", (err,roles) => {
+    db.query("SELECT id, title FROM role", (err,role) => {
         db.query("SELECT id, last_name FROM employee", (err, manager) => {
 
             inquirer.prompt([
@@ -148,7 +148,7 @@ function emp() {
                     type: "list",
                     name: "role_id",
                     message: "What is the role id for the new employee?",
-                    choices: roles.map(x => ({name: x.title, value: x.id}))
+                    choices: role.map(x => ({name: x.title, value: x.id}))
                 },
                 {
                     type: "list",
@@ -169,7 +169,7 @@ function emp() {
 
 function updateEmp() {
     db.query("SELECT id, first_name FROM employee", (err, employee) => {
-        db.query("SELECT id, title FROM roles", (err, roles) => {
+        db.query("SELECT id, title FROM role", (err, role) => {
 
             inquirer.prompt([
                 {
@@ -182,7 +182,7 @@ function updateEmp() {
                     type: "list",
                     name: "role",
                     message: "What is the new role for this employee",
-                    choices: roles.map(x => ({name: x.title, value: x.id}))
+                    choices: role.map(x => ({name: x.title, value: x.id}))
                 }
             ]) .then((answer) => {
                 db.query("UPDATE employee SET role_id = '?'  WHERE 'id' = '?' ", [answer.role, answer.employee], (err, res) => {
