@@ -30,27 +30,27 @@ function menu () {
             viewDpt();
             break;
         case "view all roles":
-            // execute view departments function
+            // execute view roles function
             viewRoles();
             break;
         case "view all employees":
-            // execute view departments function
+            // execute view employees function
             viewEmp();
             break;
         case "add a department":
-            // execute view departments function
+            // execute add departments function
             dpt();
             break;
         case "add a role":
-            // execute view departments function
+            // execute add role function
             role();
             break;
         case "add an employee":
-            // execute view departments function
+            // execute add employee function
             emp();
             break;
         case "update an employee role":
-            // execute view departments function
+            // execute update employee function
             updateEmp();
             break;
     
@@ -69,7 +69,7 @@ function viewDpt() {
 };
 
 function viewRoles() {
-    db.query("SELECT * FROM role", (err, res) => {
+    db.query("SELECT * FROM roles", (err, res) => {
         if (err) throw err;
         console.table(res);
         menu();
@@ -101,7 +101,7 @@ function dpt() {
 };
 
 function role() {
-    db.query("select id, name from department", (err, department) => {
+    db.query("SELECT id, name FROM department", (err, department) => {
 
         inquirer.prompt([
             {
@@ -111,38 +111,86 @@ function role() {
             },
             {
                 type: "input",
-            name: "salary",
-            message: "What is the salary of this role?"
+                name: "salary",
+                message: "What is the salary of this role?"
             },
             {
-            type: "list",
-            name: "department_id",
-            message: "What is the department_id of this role?",
-            choices: department.map(x => ({name: x.name, value: x.id}))
+                type: "list",
+                name: "department_id",
+                message: "What is the department_id of this role?",
+                choices: department.map(x => ({name: x.name, value: x.id}))
             }
             ]) .then((answer) => {
-            db.query("INSERT INTO role (title, salary, department_id) VALUES (?,?,?)", [answer.title, answer.salary, answer.department_id], (err, res) => {
+                db.query("INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)", [answer.title, answer.salary, answer.department_id], (err, res) => {
                 if (err) throw err;
                 console.table(res);
-             menu();
+                menu();
             });
         });
     });
 };
 function emp() {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "employee",
-            message: "Who would you like to add?"
-        }
-    ]) .then((answer) => {
-        db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)", answer.role, (err, res) => {
-            if (err) throw err;
-            console.table(res);
-            menu();
-        })
-    })
+    db.query("SELECT id, title FROM roles", (err,roles) => {
+        db.query("SELECT id, last_name FROM employee", (err, manager) => {
+
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "first_name",
+                    message: "What is the first name of the new employee?",
+                },
+                {
+                    type: "input",
+                    name: "last_name",
+                    message: "What is the last name of the new employee?",
+                },
+                {
+                    type: "list",
+                    name: "role_id",
+                    message: "What is the role id for the new employee?",
+                    choices: roles.map(x => ({name: x.title, value: x.id}))
+                },
+                {
+                    type: "list",
+                    name: "manager",
+                    message: "What is the manager id for the new employee?",
+                    choices: manager.map(x => ({name: x.title, value: x.id}))
+                }
+            ]) .then((answer) => {
+                db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)", [answer.first_name, answer.last_name, answer.role_id, answer.manager], (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    menu();
+                });
+            });
+        });
+    });
 };
 
+function updateEmp() {
+    db.query("SELECT id, first_name FROM employee", (err, employee) => {
+        db.query("SELECT id, title FROM roles", (err, roles) => {
 
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "employee",
+                    message: "Which employee would you like to update?",
+                    choices: employee.map(x => ({name: x.first_name, value: x.id}))
+                },
+                {
+                    type: "list",
+                    name: "role",
+                    message: "What is the new role for this employee",
+                    choices: roles.map(x => ({name: x.title, value: x.id}))
+                }
+            ]) .then((answer) => {
+                db.query("UPDATE employee SET role_id = '?'  WHERE 'id' = '?' ", [answer.role, answer.employee], (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    menu();
+                });
+            });
+        });
+    });
+};
